@@ -1,0 +1,63 @@
+{
+  "name": "@iamgx/pro-layout",
+  "version": "1.0.0",
+  "description": "pro-layout",
+  "private": false,
+  "main": "./dist/pro-layout.umd.min.js",
+  "scripts": {
+    "dev": "vue-cli-service serve",
+    "lint": "vue-cli-service lint --fix",
+    "build": "vue-cli-service build --target lib --name pro-layout --dest dist ./src/packages/index.js",
+    "release": "npm run build && npm version patch && npm publish --access public"
+  },
+  "files": [
+    "dist",
+    "package.json",
+    "README.md"
+  ],
+  "dependencies": {
+    "@iamgx/element-ui-theme-set": "^1.0.2",
+    "@iamgx/fullscreen": "^1.0.1",
+    "lodash.debounce": "^4.0.8"
+  },
+  "peerDependency": {
+    "element-ui": "^2.15.6",
+    "vue": "^2.6.11"
+  },
+  "devDependencies": {
+    "@vue/cli-plugin-babel": "^3.12.0",
+    "@vue/cli-plugin-eslint": "^3.12.0",
+    "@vue/cli-service": "^3.12.0",
+    "@vue/eslint-config-prettier": "^5.0.0",
+    "babel-eslint": "^10.0.1",
+    "element-ui": "^2.15.6",
+    "eslint": "^5.16.0",
+    "eslint-plugin-prettier": "^3.1.0",
+    "eslint-plugin-vue": "^5.0.0",
+    "node-sass": "^4.14.1",
+    "np": "^6.4.0",
+    "prettier": "^1.18.2",
+    "sass": "^1.49.8",
+    "sass-loader": "^9.0.3",
+    "vue": "^2.6.11",
+    "vue-template-compiler": "^2.6.10"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/essential",
+      "eslint:recommended"
+    ],
+    "parserOptions": {
+      "parser": "babel-eslint"
+    },
+    "rules": {}
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions"
+  ]
+}
