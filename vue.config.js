@@ -20,7 +20,9 @@ module.exports =
       }
     : {
         productionSourceMap: false,
-
+        chainWebpack: config => {
+          // config.plugin('inline-source').use(require('html-webpack-inline-source-plugin'))
+        },
         configureWebpack: {
           output: {
             filename: 'pro-layout/index.js',
@@ -30,8 +32,6 @@ module.exports =
           }
         },
         css: {
-          extract: {
-            filename: 'style.css'
-          }
+          extract: false
         }
       }

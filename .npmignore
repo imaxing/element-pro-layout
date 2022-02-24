@@ -24,12 +24,6 @@ package-lock.json
 .babelrc
 jsdoc.config.json
 
-dist/demo.html
-dist/pro-layout.common.js
-dist/pro-layout.common.1.js
-dist/pro-layout.common.2.js
-dist/pro-layout.umd.js
-dist/pro-layout.umd.1.js
-dist/pro-layout.umd.2.js
-dist/pro-layout.umd.min.1.js
-dist/pro-layout.umd.min.2.js
+/dist/demo.html
+/dist/pro-layout.common.js
+/dist/pro-layout.umd.js
