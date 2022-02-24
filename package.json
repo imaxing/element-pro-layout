@@ -11,7 +11,7 @@
     "release": "npm run build && npm version patch && npm publish --access public"
   },
   "files": [
-    "dist",
+    "dist/pro-layout.umd.min.js",
     "package.json",
     "README.md"
   ],
@@ -25,7 +25,6 @@
     "vue": "^2.6.11"
   },
   "devDependencies": {
-    "@iamgx/pro-layout": "^1.0.0",
     "@vue/cli-plugin-babel": "^3.12.0",
     "@vue/cli-plugin-eslint": "^3.12.0",
     "@vue/cli-service": "^3.12.0",
@@ -35,7 +34,6 @@
     "eslint": "^5.16.0",
     "eslint-plugin-prettier": "^3.1.0",
     "eslint-plugin-vue": "^5.0.0",
-    "html-webpack-inline-source-plugin": "^0.0.10",
     "prettier": "^1.18.2",
     "sass": "^1.49.8",
     "sass-loader": "^9.0.3",
