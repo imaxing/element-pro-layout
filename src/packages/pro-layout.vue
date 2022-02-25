@@ -2,6 +2,7 @@
 import debounce from 'lodash.debounce'
 import modifyTheme from '@iamgx/element-ui-theme-set'
 import Fullscreen from '@iamgx/fullscreen'
+import loadStyle from '@iamgx/load-style'
 const defaultAvatar = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'
 
 // 检测屏幕大小是否为手机端尺寸
@@ -69,6 +70,7 @@ const LayoutProps = {
 // watch
 const WatchMixin = {
   mounted() {
+    loadStyle('https://at.alicdn.com/t/font_3206016_ia67xvao7n.css')
     const unWatchMobile = this.$watch(
       'mobile',
       value => {
@@ -116,7 +118,7 @@ export default {
     const ToggleButton = h(
       'div',
       {
-        class: 'icon-container toggle-button',
+        class: { 'icon-container toggle-button': true, collapsed },
         on: {
           click: () => {
             this.$emit('update:collapsed', !collapsed)
@@ -124,13 +126,13 @@ export default {
           }
         }
       },
-      [h('i', { class: collapsed ? 'el-icon-s-fold' : 'el-icon-s-unfold' })]
+      [h('i', { class: 'iconfont icon-menu' })]
     )
 
     const ColorPicker = h('div', { class: 'icon-container' }, [
       h('el-tooltip', { props: { content: '换色' } }, [
         h('el-color-picker', {
-          props: { value: theme },
+          props: { value: theme, size: 'mini' },
           on: { change: theme => this.$emit('update:theme', theme) }
         })
       ])
@@ -138,12 +140,16 @@ export default {
 
     const FullscreenIcon = h('div', { class: 'icon-container', on: { click: Fullscreen.toggle } }, [
       h('el-tooltip', { props: { content: !this.state ? '全屏' : '退出全屏' } }, [
-        h('i', { class: 'el-icon-full-screen' })
+        h('i', { class: !this.state ? 'iconfont icon-fullscreen' : 'iconfont icon-fullscreen-exit' })
       ])
     ])
 
     const Feedback = h('div', { class: 'icon-container' }, [
-      h('el-tooltip', { props: { content: '反馈' } }, [h('i', { class: 'el-icon-chat-line-square' })])
+      h('el-tooltip', { props: { content: '反馈' } }, [h('i', { class: 'iconfont icon-feedback' })])
+    ])
+
+    const Language = h('div', { class: 'icon-container' }, [
+      h('el-tooltip', { props: { content: '多语言' } }, [h('i', { class: 'iconfont icon-language' })])
     ])
 
     const Notice = h(
@@ -175,7 +181,7 @@ export default {
             )
         }
       },
-      [h('p', '首页'), h('p', '个人中心'), h('p', { props: { divided: true } }, '退出登录')]
+      [h('p', '首页'), h('p', '个人中心'), h('p', '退出登录')]
     )
 
     // logo
@@ -237,10 +243,12 @@ export default {
             ToggleButton,
             h('div', { class: 'header-right' }, [
               $scopedSlots.rightContentRender,
-              Feedback,
-              notice && Notice,
               theme && ColorPicker,
               fullscreen && FullscreenIcon,
+              Feedback,
+              notice && Notice,
+              Language,
+
               User
             ])
           ]
@@ -285,6 +293,10 @@ $sideBarHideWidth: 54px;
     &.toggle-button {
       width: $headerHeight;
       min-width: $headerHeight;
+      transition: transform ease-in-out 0.2s;
+      &.collapsed i {
+        transform: rotate(90deg);
+      }
       &:hover {
         background: rgba(0, 0, 0, 0.025);
       }
