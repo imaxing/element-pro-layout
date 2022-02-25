@@ -135,6 +135,43 @@ export default {
         })
       ])
     ])
+    // 中英文切换
+    const LangPicker = h(
+      'el-popover',
+      {
+        props: { trigger: 'click' },
+        on: { command: lang => this.$message('click on item ' + lang) },
+        scopedSlots: {
+          reference: () =>
+            h('div', { class: 'icon-container' }, [
+              h(
+                'el-tooltip',
+                { props: { content: '中英文' } },
+                [h('i', { class: 'el-icon-bell' })],
+                [h('el-dropdown-menu')]
+              )
+            ])
+        }
+      },
+      [
+        h('el-dropdown-item', { props: { command: 'zh' } }, '中文'),
+        h('el-dropdown-item', { props: { command: 'en', divided: true } }, 'English')
+      ]
+    )
+
+    // 主题
+    const ThemePicker = h(
+      'div',
+      {
+        class: 'icon-container',
+        on: {
+          click: () => {
+            this.$message('dialog')
+          }
+        }
+      },
+      [h('el-tooltip', { props: { content: '主题' } }, [h('i', { class: 'el-icon-user' })])]
+    )
 
     const FullscreenIcon = h('div', { class: 'icon-container', on: { click: Fullscreen.toggle } }, [
       h('el-tooltip', { props: { content: !this.state ? '全屏' : '退出全屏' } }, [
@@ -240,6 +277,8 @@ export default {
               Feedback,
               notice && Notice,
               theme && ColorPicker,
+              ThemePicker,
+              LangPicker,
               fullscreen && FullscreenIcon,
               User
             ])
