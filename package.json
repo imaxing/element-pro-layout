@@ -18,6 +18,7 @@
   "dependencies": {
     "@iamgx/element-ui-theme-set": "^1.0.2",
     "@iamgx/fullscreen": "^1.0.1",
+    "@iamgx/load-style": "^1.0.0",
     "lodash.debounce": "^4.0.8"
   },
   "peerDependency": {
