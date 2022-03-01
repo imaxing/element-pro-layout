@@ -146,7 +146,7 @@ export default {
             'el-dropdown-menu',
             { slot: 'dropdown' },
             data.map(item =>
-              h('el-dropdown-item', { props: { ...item, command: item.label || item.value } }, item.label)
+              h('el-dropdown-item', { props: { ...item, command: item.value || item.label } }, item.label)
             )
           ),
           children
