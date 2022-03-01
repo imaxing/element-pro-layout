@@ -402,6 +402,8 @@ $sideBarHideWidth: 54px;
       .sidebar-logo {
         width: 32px;
         height: 32px;
+        max-width: 32px;
+        max-height: 32px;
         vertical-align: middle;
         &.un-collapsed {
           margin-right: 0px;
