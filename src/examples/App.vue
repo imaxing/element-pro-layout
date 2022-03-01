@@ -1,16 +1,36 @@
 <template>
   <div id="app" style="height: 100vh">
+    <!-- logo="https://tva1.sinaimg.cn/large/008i3skNgy1gz8i4tglttj308207z749.jpg" -->
     <pro-layout
       :fixed-header="false"
-      menu-active="/material/supplierpro"
-      logo="https://tva1.sinaimg.cn/large/008i3skNgy1gz8i4tglttj308207z749.jpg"
+      :menu-active.sync="menuActive"
       :collapsed.sync="collapsed"
       :theme.sync="theme"
+      title="SRM"
       :menus="menus"
+      :languages="languages"
+      :top-menus="topMenus"
+      @top-menu-click="onTopMenuClicked"
     >
-      <el-button type="primary">
-        hello world
-      </el-button>
+      <el-tabs slot="notice" type="border-card">
+        <el-tab-pane label="用户管理" name="first">
+          用户管理
+        </el-tab-pane>
+        <el-tab-pane label="配置管理" name="second">
+          配置管理
+        </el-tab-pane>
+        <el-tab-pane label="角色管理" name="third">
+          角色管理
+        </el-tab-pane>
+        <el-tab-pane label="定时任务补偿" name="fourth">
+          定时任务补偿
+        </el-tab-pane>
+      </el-tabs>
+      <p v-for="item in 50" :key="item">
+        <el-button type="primary">
+          hello world
+        </el-button>
+      </p>
     </pro-layout>
   </div>
 </template>
@@ -32,7 +52,10 @@ const menus = [
     meta: { icon: 'el-icon-s-tools', title: '供应商产品管理' },
     name: '供应商产品管理',
     path: '/material/supplierpro'
-  },
+  }
+]
+
+const systemApps = [
   {
     meta: { icon: 'el-icon-s-goods', title: '供应商新品管理' },
     name: '供应商新品管理',
@@ -47,7 +70,10 @@ const menus = [
     meta: { icon: 'el-icon-date', title: '物料主数据' },
     name: '物料主数据',
     path: '/material/info'
-  },
+  }
+]
+
+const apps = [
   {
     meta: { icon: 'el-icon-folder', title: '物料变更申请' },
     name: '物料变更申请',
@@ -64,12 +90,39 @@ const menus = [
     path: '/material/price'
   }
 ]
+
+const topMenus = [
+  {
+    icon: 'el-icon-folder',
+    text: '我的应用'
+  },
+  {
+    icon: 'el-icon-monitor',
+    text: 'OA系统'
+  },
+  {
+    meta: { icon: 'el-icon-reading', title: '价格主数据' },
+    icon: 'el-icon-reading',
+    text: '系统配置'
+  }
+]
 export default {
   name: 'App',
   data: () => ({
     collapsed: false,
     theme: '#D7C3C3',
-    menus
-  })
+    menuActive: '/material/supplierpro',
+    menus,
+    topMenus,
+    languages: [
+      { label: '中文', value: 'ch', disabled: true },
+      { label: '英文', value: 'en' }
+    ]
+  }),
+  methods: {
+    onTopMenuClicked(menu, index) {
+      this.menus = [menus, systemApps, apps][index]
+    }
+  }
 }
 </script>

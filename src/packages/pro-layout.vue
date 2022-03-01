@@ -3,7 +3,7 @@ import debounce from 'lodash.debounce'
 import modifyTheme from '@iamgx/element-ui-theme-set'
 import Fullscreen from '@iamgx/fullscreen'
 import loadStyle from '@iamgx/load-style'
-const defaultAvatar = 'https://gw.alipayobjects.com/zos/rmsportal/BiazfanxmamNRoxxVxka.png'
+const { toggle } = Fullscreen
 
 // 检测屏幕大小是否为手机端尺寸
 const isMobileMixin = {
@@ -52,29 +52,36 @@ const LayoutProps = {
     title: { type: String, default: 'Pro Layout', required: false },
     logo: { type: String, default: null, required: false },
     menus: { type: Array, default: () => [], required: true },
+    topMenus: { type: Array, default: () => [], required: false },
+    languages: { type: Array, default: () => [], required: false },
+    userOpts: { type: Array, default: () => [{ label: '首页', value: '/' }], required: false },
     collapsed: { type: Boolean, default: false, required: false },
     isMobile: { type: Boolean, default: false, required: false },
-    notice: { type: Boolean, default: true, required: false },
     fullscreen: { type: Boolean, default: true, required: false },
+    uniqueOpened: { type: Boolean, default: true, required: false },
+    feedback: { type: Boolean, default: false, required: false },
     menuActive: { type: String, default: '/', required: false },
     userName: { type: String, default: null, required: false },
-    avatar: { type: String, default: defaultAvatar, required: false },
+    avatar: { type: String, default: null, required: false },
+    popperClass: { type: String, default: '', required: false },
     menuBackgroundColor: { type: String, default: '#20222a', required: false },
     menuTextColor: { type: String, default: '#bfcbd9', required: false },
     menuActiveText: { type: String, default: '#409eff', required: false },
     theme: { type: String, default: null, required: false },
-    cssVariableName: { type: String, default: '--primary-theme', required: false }
+    cssVariableName: { type: String, default: '--primary-theme', required: false },
+    renderContent: { type: Function, default: null, required: false }
   }
 }
 
 // watch
 const WatchMixin = {
   mounted() {
-    loadStyle('https://at.alicdn.com/t/font_3206016_ia67xvao7n.css')
+    loadStyle('https://at.alicdn.com/t/font_3206016_nq7r8gbdo8s.css')
+
     const unWatchMobile = this.$watch(
       'mobile',
       value => {
-        this.$emit('update:collapsed', !value)
+        this.$emit('update:collapsed', value ? false : true)
         this.$emit('update:is-mobile', value)
       },
       { immediate: true }
@@ -101,161 +108,227 @@ export default {
   mixins: [LayoutProps, isMobileMixin, FixiOSBug, WatchMixin],
   render(h) {
     const {
-      mobile,
-      $slots,
-      theme,
+      renderContent,
+      uniqueOpened,
+      popperClass,
       fullscreen,
-      notice,
-      avatar,
-      userName,
+      languages,
       collapsed,
-      $scopedSlots,
-      logo,
+      feedback,
+      topMenus,
+      userName,
+      userOpts,
+      avatar,
+      mobile,
+      theme,
       menus,
-      title
+      title,
+      logo,
+      $slots
     } = this
 
-    const ToggleButton = h(
-      'div',
-      {
-        class: { 'icon-container toggle-button': true, collapsed },
+    const renderDropDown = ({ data = [], title, children, onCommand }) => {
+      return h(
+        'el-dropdown',
+        {
+          attrs: { title },
+          props: { width: 150, transition: 'el-zoom-in-top', trigger: 'click' },
+          on: { command: v => onCommand && onCommand(v) }
+        },
+        [
+          h(
+            'el-dropdown-menu',
+            { slot: 'dropdown' },
+            data.map(item => h('el-dropdown-item', { props: item }, item.label))
+          ),
+          children
+        ]
+      )
+    }
+
+    const renderIconContainer = ({
+      className = '',
+      condition = true,
+      children = null,
+      icon = '',
+      title,
+      onClick = () => {}
+    }) => {
+      if (!condition) return null
+      return h('div', { attrs: { title }, class: `icon-container ${className}`, on: { click: onClick } }, [
+        children || h('i', { class: icon })
+      ])
+    }
+
+    const renderPoper = ({ className = '', condition = true, reference, children }) => {
+      if (!condition) return null
+      return h(
+        'el-popover',
+        { props: { popperClass: className }, scopedSlots: { reference: () => reference } },
+        children
+      )
+    }
+
+    const ToggleButton = renderIconContainer({
+      title: collapsed ? '收起' : '展开',
+      icon: 'iconfont icon-menu',
+      className: `toggle-button ${collapsed ? 'collapsed' : ''}`,
+      onClick: () => {
+        this.$emit('update:collapsed', !collapsed)
+        this.$emit('collapse', !collapsed)
+      }
+    })
+
+    // 主题色
+    const ColorPicker = renderIconContainer({
+      title: '主题色',
+      condition: theme,
+      className: 'hide-is-mobile',
+      children: h('el-color-picker', {
+        props: { value: theme, size: 'mini' },
         on: {
-          click: () => {
-            this.$emit('update:collapsed', !collapsed)
-            this.$emit('collapse', !collapsed)
+          change: theme => {
+            this.$emit('update:theme', theme)
+            this.$emit('theme-change', theme)
           }
         }
-      },
-      [h('i', { class: 'iconfont icon-menu' })]
-    )
+      })
+    })
 
-    const ColorPicker = h('div', { class: 'icon-container' }, [
-      h('el-tooltip', { props: { content: '换色' } }, [
-        h('el-color-picker', {
-          props: { value: theme, size: 'mini' },
-          on: { change: theme => this.$emit('update:theme', theme) }
-        })
-      ])
-    ])
+    // 全屏
+    const FullscreenIcon = renderIconContainer({
+      title: '全屏',
+      condition: fullscreen,
+      className: 'hide-is-mobile',
+      onClick: toggle,
+      icon: 'el-icon-full-screen'
+    })
 
-    const FullscreenIcon = h('div', { class: 'icon-container', on: { click: Fullscreen.toggle } }, [
-      h('el-tooltip', { props: { content: !this.state ? '全屏' : '退出全屏' } }, [
-        h('i', { class: !this.state ? 'iconfont icon-fullscreen' : 'iconfont icon-fullscreen-exit' })
-      ])
-    ])
+    // 反馈
+    const Feedback = renderIconContainer({
+      title: '反馈',
+      condition: feedback,
+      className: 'hide-is-mobile',
+      onClick: () => this.$emit('feedback'),
+      icon: 'iconfont icon-feedback'
+    })
 
-    const Feedback = h('div', { class: 'icon-container' }, [
-      h('el-tooltip', { props: { content: '反馈' } }, [h('i', { class: 'iconfont icon-feedback' })])
-    ])
+    // 国际化
+    const Language = renderIconContainer({
+      title: '多语言',
+      condition: languages && languages.length > 0,
+      className: 'hide-is-mobile',
+      children: renderDropDown({
+        onCommand: v => this.$emit('language-change', v),
+        data: languages,
+        children: h('i', { class: 'iconfont icon-language' })
+      })
+    })
 
-    const Language = h('div', { class: 'icon-container' }, [
-      h('el-tooltip', { props: { content: '多语言' } }, [h('i', { class: 'iconfont icon-language' })])
-    ])
+    // 用户中心
+    const User = renderIconContainer({
+      children: renderDropDown({
+        onCommand: v => this.$emit('opt-change', v),
+        data: userOpts,
+        children: avatar
+          ? h('img', { class: 'user-avatar', attrs: { src: avatar } })
+          : [userName, h('i', { style: 'color: #93a533', class: 'iconfont icon-2PersonalCenter_01' })]
+      })
+    })
 
-    const Notice = h(
-      'el-popover',
-      {
-        props: { width: 300, transition: 'el-zoom-in-top' },
-        scopedSlots: {
-          reference: () =>
-            h('div', { class: 'icon-container' }, [
-              h('el-tooltip', { props: { content: '通知' } }, [h('i', { class: 'el-icon-bell' })])
-            ])
-        }
-      },
-      [$scopedSlots.notice || h('el-empty', { props: { description: '暂无通知' } })]
-    )
-
-    const User = h(
-      'el-popover',
-      {
-        props: { width: 100, transition: 'el-zoom-in-top' },
-        scopedSlots: {
-          reference: () =>
-            h(
-              'div',
-              { class: 'icon-container' },
-              avatar
-                ? [h('img', { class: 'user-avatar', attrs: { src: avatar } })]
-                : [userName, h('i', { class: 'el-icon-arrow-down' })]
-            )
-        }
-      },
-      [h('p', '首页'), h('p', '个人中心'), h('p', '退出登录')]
-    )
+    const Notice = renderPoper({
+      condition: !!$slots.notice,
+      className: popperClass,
+      children: $slots.notice,
+      reference: renderIconContainer({ className: 'hide-is-mobile', title: '通知', icon: 'el-icon-bell' })
+    })
 
     // logo
-    const SideBarLogo = h('a', { class: 'sidebar-logo-container', attrs: { href: '/' } }, [
-      collapsed
-        ? h('span', { class: 'sidebar-title' }, title)
-        : logo
-        ? h('img', { class: 'sidebar-logo', attrs: { src: logo, alt: title } })
-        : h('span', { class: 'sidebar-title' }, title.substr(0, 1))
-    ])
+    const SideBarLogo = h(
+      'a',
+      { class: 'sidebar-logo-container', attrs: { href: '/' } },
+      $slots.menuHeaderRender || [
+        collapsed
+          ? h('span', { class: 'sidebar-title' }, title)
+          : logo
+          ? h('img', { class: 'sidebar-logo', attrs: { src: logo, alt: title } })
+          : h('span', { class: 'sidebar-title' }, title.substr(0, 1))
+      ]
+    )
 
     const Menu = (
       <el-menu
         mode='vertical'
-        unique-opened
+        unique-opened={uniqueOpened}
         default-active={this.menuActive}
         text-color={this.menuTextColor}
         background-color={this.menuBackgroundColor}
         active-text-color={this.menuActiveText}
         collapse={!collapsed}
       >
-        {menus
-          .filter(menu => !menu.hidden)
-          .map((menu, index) =>
-            menu.children ? (
-              <el-submenu ref='subMenu' index={menu.path} key={index}>
-                <template slot='title'>
-                  <i class={menu.meta.icon} />
-                  <span slot='title'>{menu.meta.title}</span>
-                </template>
-                {menu.children.map(sMenu => (
-                  <el-menu-item key={sMenu.path + index} index={sMenu.path}>
-                    <i class={sMenu.meta.icon} />
-                    {sMenu.meta.title}
-                  </el-menu-item>
-                ))}
-              </el-submenu>
-            ) : (
-              <el-menu-item index={menu.path} key={index}>
+        {menus.map((menu, index) =>
+          menu.children ? (
+            <el-submenu ref='subMenu' index={menu.path} key={index}>
+              <template slot='title'>
                 <i class={menu.meta.icon} />
                 <span slot='title'>{menu.meta.title}</span>
-              </el-menu-item>
-            )
-          )}
+              </template>
+              {menu.children.map(sMenu => (
+                <el-menu-item key={sMenu.path + index} index={sMenu.path}>
+                  <i class={sMenu.meta.icon} />
+                  {sMenu.meta.title}
+                </el-menu-item>
+              ))}
+            </el-submenu>
+          ) : (
+            <el-menu-item index={menu.path} key={index}>
+              <i class={menu.meta.icon} />
+              <span slot='title'>{menu.meta.title}</span>
+            </el-menu-item>
+          )
+        )}
       </el-menu>
     )
+
+    const TopMenu = topMenus.map((menu, index) => {
+      return h(
+        'div',
+        {
+          class: 'top-menu hide-is-mobile',
+          on: {
+            click: () => {
+              this.$emit('top-menu-click', menu, index)
+              this.$emit('update:menu-active', null)
+            }
+          }
+        },
+        [h('i', { class: menu.icon }), menu.text]
+      )
+    })
 
     // layout
     return h('div', { class: { mobile, 'hide-sidebar': !collapsed, 'pro-layout': true } }, [
       // sidebar
-      h('div', { class: 'sidebar' }, [$scopedSlots.menuHeaderRender || SideBarLogo, h('el-scrollbar', [Menu])]),
+      h('div', { class: 'sidebar' }, [SideBarLogo, h('el-scrollbar', [Menu])]),
       // main
       h('div', { class: 'main' }, [
         // header
-        h(
-          'div',
-          { class: 'header' },
-          $scopedSlots.headerRender || [
-            ToggleButton,
-            h('div', { class: 'header-right' }, [
-              $scopedSlots.rightContentRender,
-              theme && ColorPicker,
-              fullscreen && FullscreenIcon,
-              Feedback,
-              notice && Notice,
-              Language,
-
-              User
-            ])
-          ]
-        ),
+        h('div', { class: 'header' }, [
+          h('div', { class: 'header-left' }, [ToggleButton, TopMenu]),
+          h('div', { class: 'header-center' }, $slots.headerCenter),
+          h('div', { class: 'header-right' }, [
+            h('div', { class: 'hide-is-mobile' }, $slots.headerRight),
+            ColorPicker,
+            FullscreenIcon,
+            Feedback,
+            Notice,
+            Language,
+            User
+          ])
+        ]),
         // content
         h('transition', { props: { name: 'fade-transform', mode: 'out-in' } }, [
-          h('div', { class: 'main-content' }, [$slots.default])
+          h('div', { class: 'main-content' }, [renderContent ? renderContent(h) : $slots.default])
         ])
       ])
     ])
@@ -264,13 +337,6 @@ export default {
 </script>
 
 <style lang="scss">
-$subMenuActiveText: #f4f4f5;
-
-$menuBg: #20222a;
-$menuHover: #263445;
-
-$subMenuBg: #1f2d3d;
-$subMenuHover: #001528;
 $headerHeight: 60px;
 $sideBarWidth: 210px;
 $sideBarHideWidth: 54px;
@@ -282,14 +348,16 @@ $sideBarHideWidth: 54px;
 
   .icon-container {
     height: $headerHeight;
-    width: calc(#{$headerHeight} / 1.3);
+    width: calc(#{$headerHeight} / 1.2);
     float: left;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 20px;
-
+    &:hover {
+      background: rgba(0, 0, 0, 0.025);
+    }
     &.toggle-button {
       width: $headerHeight;
       min-width: $headerHeight;
@@ -297,33 +365,31 @@ $sideBarHideWidth: 54px;
       &.collapsed i {
         transform: rotate(90deg);
       }
-      &:hover {
-        background: rgba(0, 0, 0, 0.025);
-      }
     }
   }
 
   .sidebar {
-    transition: width 0.28s;
+    transition: width 0.2s cubic-bezier(0.22, -0.26, 0.85, 1.24);
     width: $sideBarWidth !important;
-    background-color: $menuBg;
-    height: 100%;
+    height: 100vh;
     position: fixed;
-    font-size: 0px;
     top: 0;
     bottom: 0;
     left: 0;
     z-index: 1001;
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
     .sidebar-logo-container {
       position: relative;
       width: 100%;
-      height: 64px;
-      line-height: 64px;
+      height: $headerHeight;
+      line-height: $headerHeight;
       background: #20222a;
       text-align: center;
       display: inline-block;
       overflow: hidden;
+      text-decoration: none;
 
       .sidebar-logo {
         width: 32px;
@@ -348,7 +414,10 @@ $sideBarHideWidth: 54px;
       }
     }
     .el-scrollbar {
-      height: calc(100% - 50px);
+      height: calc(100% - #{$headerHeight});
+      .el-scrollbar__view {
+        height: 100%;
+      }
     }
   }
 
@@ -371,19 +440,38 @@ $sideBarHideWidth: 54px;
       z-index: 9;
       width: calc(100% - #{$sideBarWidth});
 
+      .header-center,
+      .header-left,
       .header-right {
-        flex-grow: 1;
-        height: $headerHeight;
         display: flex;
         align-items: center;
-        justify-content: flex-end;
-        padding: 0 10px 0 0;
-        .user-avatar {
-          width: 30px;
-          height: 30px;
-          object-fit: contain;
+        height: $headerHeight;
+      }
+      .header-center {
+        flex-grow: 1;
+      }
+
+      .top-menu {
+        font-size: 14px;
+        color: #303133;
+        padding: 0 8px;
+        height: $headerHeight;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        &:hover {
+          background: rgba(0, 0, 0, 0.025);
+        }
+        i {
           margin-right: 4px;
         }
+      }
+
+      .user-avatar {
+        width: 30px;
+        height: 30px;
+        object-fit: contain;
       }
     }
 
@@ -417,68 +505,58 @@ $sideBarHideWidth: 54px;
       transition: 0s width ease-in-out, 0s padding-left ease-in-out, 0s padding-right ease-in-out;
     }
 
-    .el-menu-item {
-      &:hover {
-        background-color: $menuHover !important;
-      }
-    }
+    // scroll-bar
     &::-webkit-scrollbar-track-piece {
       background: #d3dce6;
     }
-
     &::-webkit-scrollbar {
       width: 6px;
     }
-
     &::-webkit-scrollbar-thumb {
       background: #99a9bf;
       border-radius: 20px;
     }
-
-    .el-menu--collapse .el-menu .el-submenu {
-      min-width: $sideBarWidth !important;
-    }
-
     .scrollbar-wrapper {
       overflow-x: hidden !important;
     }
-
     .el-scrollbar__bar.is-vertical {
       right: 0px;
     }
-
-    .el-scrollbar {
-      height: 100%;
-    }
-
     .is-horizontal {
       display: none;
     }
+    // scroll-bar end
 
+    // el-menu
     .el-menu {
       border: none;
       height: 100%;
       width: 100% !important;
-    }
 
-    // // menu hover
-    .el-submenu__title {
-      &:hover {
-        background-color: $menuHover !important;
+      .el-menu-item:hover,
+      .el-submenu__title:hover {
+        background-color: #263445 !important;
+      }
+
+      .nest-menu .el-submenu > .el-submenu__title,
+      .el-submenu .el-menu-item {
+        min-width: $sideBarWidth !important;
+        background-color: #1f2d3d !important; // submenu bg
+        &:hover {
+          background-color: #001528 !important; // submenu hover bg
+        }
       }
     }
-
-    & .nest-menu .el-submenu > .el-submenu__title,
-    & .el-submenu .el-menu-item {
-      min-width: $sideBarWidth !important;
-      background-color: $subMenuBg !important;
-
-      &:hover {
-        background-color: $subMenuHover !important;
-      }
-    }
+    // el-menu end
   }
 }
+
+@media (max-width: 767px) {
+  .hide-is-mobile {
+    display: none !important;
+  }
+}
+
 .fade-transform-leave-active,
 .fade-transform-enter-active {
   transition: all 0.5s;
