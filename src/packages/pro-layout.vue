@@ -278,20 +278,20 @@ export default {
           menu.children ? (
             <el-submenu ref='subMenu' index={menu.path} key={index}>
               <template slot='title'>
-                <i class={menu.meta.icon} />
-                <span slot='title'>{menu.meta.title}</span>
+                <i class={menu.icon || menu.meta.icon} />
+                <span slot='title'>{menu.name || menu.title || menu.meta.title}</span>
               </template>
               {menu.children.map(sMenu => (
                 <el-menu-item key={sMenu.path + index} index={sMenu.path}>
-                  <i class={sMenu.meta.icon} />
-                  {sMenu.meta.title}
+                  <i class={sMenu.icon || sMenu.meta.icon} />
+                  {sMenu.name || sMenu.title || sMenu.meta.title}
                 </el-menu-item>
               ))}
             </el-submenu>
           ) : (
             <el-menu-item index={menu.path} key={index}>
-              <i class={menu.meta.icon} />
-              <span slot='title'>{menu.meta.title}</span>
+              <i class={menu.icon || menu.meta.icon} />
+              <span slot='title'>{menu.name || menu.title || menu.meta.title}</span>
             </el-menu-item>
           )
         )}
