@@ -133,13 +133,21 @@ export default {
         {
           attrs: { title },
           props: { width: 150, transition: 'el-zoom-in-top', trigger: 'click' },
-          on: { command: v => onCommand && onCommand(v) }
+          on: {
+            command: v => {
+              const item = data.find(item => item.label === v || item.value === v) || {}
+              item.callback && item.callback(item)
+              onCommand && onCommand(v)
+            }
+          }
         },
         [
           h(
             'el-dropdown-menu',
             { slot: 'dropdown' },
-            data.map(item => h('el-dropdown-item', { props: item }, item.label))
+            data.map(item =>
+              h('el-dropdown-item', { props: { ...item, command: item.label || item.value } }, item.label)
+            )
           ),
           children
         ]
@@ -315,7 +323,7 @@ export default {
         // header
         h('div', { class: 'header' }, [
           h('div', { class: 'header-left' }, [ToggleButton, TopMenu]),
-          h('div', { class: 'header-center' }, $slots.headerCenter),
+          $slots.headerCenter && h('div', { class: 'header-center' }, $slots.headerCenter),
           h('div', { class: 'header-right' }, [
             h('div', { class: 'hide-is-mobile' }, $slots.headerRight),
             ColorPicker,
