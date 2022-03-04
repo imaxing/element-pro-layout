@@ -31,6 +31,9 @@
           hello world
         </el-button>
       </p>
+      <!-- <el-tag slot="headerBottom">
+        asdasdasd
+      </el-tag> -->
     </pro-layout>
   </div>
 </template>

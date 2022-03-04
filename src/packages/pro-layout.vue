@@ -339,11 +339,14 @@ export default {
             Notice,
             Language,
             User
-          ])
+          ]),
+          $slots.headerBottom && h('div', { class: 'header-bottom' }, $slots.headerBottom)
         ]),
         // content
         h('transition', { props: { name: 'fade-transform', mode: 'out-in' } }, [
-          h('div', { class: 'main-content' }, [renderContent ? renderContent(h) : $slots.default])
+          h('div', { class: { 'main-content': true, 'has-header--bottom': !!$slots.headerBottom } }, [
+            renderContent ? renderContent(h) : $slots.default
+          ])
         ])
       ])
     ])
@@ -355,6 +358,7 @@ export default {
 $headerHeight: 60px;
 $sideBarWidth: 210px;
 $sideBarHideWidth: 54px;
+$headerBottomHeight: 40px;
 
 .pro-layout {
   position: relative;
@@ -467,6 +471,13 @@ $sideBarHideWidth: 54px;
       .header-center {
         flex-grow: 1;
       }
+      .header-bottom {
+        width: 100%;
+        height: $headerBottomHeight;
+        position: absolute;
+        top: 100%;
+        left: 0;
+      }
 
       .top-menu {
         font-size: 14px;
@@ -495,6 +506,9 @@ $sideBarHideWidth: 54px;
     .main-content {
       padding: 15px;
       transform: translateY($headerHeight);
+      &.has-header--bottom {
+        transform: translateY(#{$headerHeight + $headerBottomHeight});
+      }
     }
   }
 
