@@ -67,7 +67,7 @@ const LayoutProps = {
     menuBackgroundColor: { type: String, default: '#20222a', required: false },
     menuTextColor: { type: String, default: '#bfcbd9', required: false },
     menuActiveText: { type: String, default: '#409eff', required: false },
-    theme: { type: String, default: null, required: false },
+    theme: { type: String, default: '#409eff', required: false, validator: theme => !!theme && theme.startsWith('#') },
     cssVariableName: { type: String, default: '--primary-theme', required: false },
     renderContent: { type: Function, default: null, required: false },
     router: { type: Boolean, default: false, required: false }
@@ -89,11 +89,13 @@ const WatchMixin = {
     )
     const unWatchTheme = this.$watch(
       'theme',
-      v =>
+      v => {
+        if (!v) return
         modifyTheme({
           theme: v,
           themeName: this.cssVariableName
-        }),
+        })
+      },
       { immediate: true }
     )
 
