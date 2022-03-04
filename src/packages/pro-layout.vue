@@ -105,6 +105,7 @@ const WatchMixin = {
 
 export default {
   name: 'ProLayout',
+  // for test
   mixins: [LayoutProps, isMobileMixin, FixiOSBug, WatchMixin],
   render(h) {
     const {
