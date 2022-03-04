@@ -69,8 +69,7 @@ const LayoutProps = {
     menuActiveText: { type: String, default: '#409eff', required: false },
     theme: { type: String, default: null, required: false },
     cssVariableName: { type: String, default: '--primary-theme', required: false },
-    renderContent: { type: Function, default: null, required: false },
-    onMenuClick: { type: Function, default: null, required: false }
+    renderContent: { type: Function, default: null, required: false }
   }
 }
 
@@ -116,7 +115,6 @@ export default {
       languages,
       collapsed,
       feedback,
-      onMenuClick,
       topMenus,
       userName,
       userOpts,
@@ -276,7 +274,7 @@ export default {
         active-text-color={this.menuActiveText}
         collapse={!collapsed}
         onSelect={(index, indexPath) => {
-          onMenuClick && onMenuClick(index, indexPath)
+          this.$emit('menu-click', index, indexPath)
         }}
       >
         {menus.map((menu, index) =>
