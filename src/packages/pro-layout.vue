@@ -69,7 +69,8 @@ const LayoutProps = {
     menuActiveText: { type: String, default: '#409eff', required: false },
     theme: { type: String, default: null, required: false },
     cssVariableName: { type: String, default: '--primary-theme', required: false },
-    renderContent: { type: Function, default: null, required: false }
+    renderContent: { type: Function, default: null, required: false },
+    onMenu: { type: Function, default: null, required: false }
   }
 }
 
@@ -115,6 +116,7 @@ export default {
       languages,
       collapsed,
       feedback,
+      onMenu,
       topMenus,
       userName,
       userOpts,
@@ -273,6 +275,7 @@ export default {
         background-color={this.menuBackgroundColor}
         active-text-color={this.menuActiveText}
         collapse={!collapsed}
+        router={true}
       >
         {menus.map((menu, index) =>
           menu.children ? (
@@ -282,14 +285,14 @@ export default {
                 <span slot='title'>{menu.name || menu.title || menu.meta.title}</span>
               </template>
               {menu.children.map(sMenu => (
-                <el-menu-item key={sMenu.path + index} index={sMenu.path}>
+                <el-menu-item key={sMenu.path + index} index={sMenu.path} route={sMenu.path} onMenu={() => sMenu}>
                   <i class={sMenu.icon || sMenu.meta.icon} />
                   {sMenu.name || sMenu.title || sMenu.meta.title}
                 </el-menu-item>
               ))}
             </el-submenu>
           ) : (
-            <el-menu-item index={menu.path} key={index}>
+            <el-menu-item index={menu.path} key={index} route={menu.path} onMenu={() => menu}>
               <i class={menu.icon || menu.meta.icon} />
               <span slot='title'>{menu.name || menu.title || menu.meta.title}</span>
             </el-menu-item>
