@@ -313,7 +313,7 @@ export default {
           on: {
             click: () => {
               this.$emit('top-menu-click', menu, index)
-              this.$emit('update:menu-active', null)
+              this.$emit('update:menu-active', '')
             }
           }
         },
