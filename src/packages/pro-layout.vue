@@ -70,7 +70,7 @@ const LayoutProps = {
     theme: { type: String, default: null, required: false },
     cssVariableName: { type: String, default: '--primary-theme', required: false },
     renderContent: { type: Function, default: null, required: false },
-    routerFlg: { type: Boolean, default: false, required: false },
+    router: { type: Boolean, default: false, required: false }
   }
 }
 
@@ -116,7 +116,7 @@ export default {
       fullscreen,
       languages,
       collapsed,
-      routerFlg,
+      router,
       feedback,
       topMenus,
       userName,
@@ -279,7 +279,7 @@ export default {
         onSelect={(index, indexPath) => {
           this.$emit('menu-click', index, indexPath)
         }}
-        router={routerFlg}
+        router={router}
       >
         {menus.map((menu, index) =>
           menu.children ? (
