@@ -578,10 +578,6 @@ $headerBottomHeight: 40px;
       .nest-menu .el-submenu > .el-submenu__title,
       .el-submenu .el-menu-item {
         min-width: $sideBarWidth !important;
-        background-color: #1f2d3d !important; // submenu bg
-        &:hover {
-          background-color: #001528 !important; // submenu hover bg
-        }
       }
     }
     // el-menu end
