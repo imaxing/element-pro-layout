@@ -10,6 +10,12 @@
       :menus="menus"
       :languages="languages"
       :top-menus="topMenus"
+      :right-icons="[
+        {
+          onClick: onIconClicked,
+          render: h => h('el-badge', { props: { value: 10 } }, [h('i', { class: 'iconfont icon-feedback' })])
+        }
+      ]"
       @top-menu-click="onTopMenuClicked"
     >
       <el-tabs slot="notice" type="border-card">
@@ -31,9 +37,6 @@
           hello world
         </el-button>
       </p>
-      <!-- <el-tag slot="headerBottom">
-        asdasdasd
-      </el-tag> -->
     </pro-layout>
   </div>
 </template>
@@ -123,6 +126,9 @@ export default {
     ]
   }),
   methods: {
+    onIconClicked() {
+      console.log('icon click')
+    },
     onTopMenuClicked(menu, index) {
       this.menus = [menus, systemApps, apps][index]
     }
