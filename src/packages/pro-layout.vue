@@ -54,6 +54,7 @@ const LayoutProps = {
     menus: { type: Array, default: () => [], required: true },
     topMenus: { type: Array, default: () => [], required: false },
     languages: { type: Array, default: () => [], required: false },
+    rightIcons: { type: Array, default: () => [], required: false },
     userOpts: { type: Array, default: () => [{ label: '首页', value: '/' }], required: false },
     collapsed: { type: Boolean, default: false, required: false },
     isMobile: { type: Boolean, default: false, required: false },
@@ -123,6 +124,7 @@ export default {
       topMenus,
       userName,
       userOpts,
+      rightIcons,
       avatar,
       mobile,
       theme,
@@ -165,11 +167,12 @@ export default {
       children = null,
       icon = '',
       title,
+      render,
       onClick = () => {}
     }) => {
       if (!condition) return null
       return h('div', { attrs: { title }, class: `icon-container ${className}`, on: { click: onClick } }, [
-        children || h('i', { class: icon })
+        render ? render(h) : children || h('i', { class: icon })
       ])
     }
 
@@ -337,8 +340,7 @@ export default {
             h('div', { class: 'hide-is-mobile' }, $slots.headerRight),
             ColorPicker,
             FullscreenIcon,
-            $slots.headerRightOptions &&
-              h('div', { class: 'icon-container hide-is-mobile' }, $slots.headerRightOptions),
+            rightIcons && rightIcons.length > 0 && rightIcons.map(renderIconContainer),
             Feedback,
             Notice,
             Language,
