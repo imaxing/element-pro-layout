@@ -337,6 +337,7 @@ export default {
             h('div', { class: 'hide-is-mobile' }, $slots.headerRight),
             ColorPicker,
             FullscreenIcon,
+            $slots.headerRightOptions && h('div', { class: 'hide-is-mobile' }, $slots.headerRightOptions),
             Feedback,
             Notice,
             Language,
