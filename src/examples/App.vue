@@ -6,6 +6,7 @@
       :menu-active.sync="menuActive"
       :collapsed.sync="collapsed"
       :theme.sync="theme"
+      :render-menu-header="h => h('em', '哈哈哈')"
       title="SRM"
       :menus="menus"
       :languages="languages"

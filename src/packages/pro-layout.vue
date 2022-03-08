@@ -72,6 +72,11 @@ const LayoutProps = {
     theme: { type: String, default: '#409eff', required: false, validator: theme => !!theme && theme.startsWith('#') },
     cssVariableName: { type: String, default: '--primary-theme', required: false },
     renderContent: { type: Function, default: null, required: false },
+    renderHeaderBottom: { type: Function, default: null, required: false },
+    renderHeaderCenter: { type: Function, default: null, required: false },
+    renderHeaderLeft: { type: Function, default: null, required: false },
+    renderHeaderRight: { type: Function, default: null, required: false },
+    renderMenuHeader: { type: Function, default: null, required: false },
     router: { type: Boolean, default: false, required: false }
   }
 }
@@ -132,6 +137,11 @@ export default {
       theme,
       menus,
       title,
+      renderHeaderBottom,
+      renderHeaderLeft,
+      renderHeaderCenter,
+      renderMenuHeader,
+      renderHeaderRight,
       logo,
       $slots
     } = this
@@ -258,13 +268,15 @@ export default {
     const SideBarLogo = h(
       'a',
       { class: 'sidebar-logo-container', attrs: { href: '/' } },
-      $slots.menuHeaderRender || [
-        collapsed
-          ? h('span', { class: 'sidebar-title' }, title)
-          : logo
-          ? h('img', { class: 'sidebar-logo', attrs: { src: logo, alt: title } })
-          : h('span', { class: 'sidebar-title' }, title.substr(0, 1))
-      ]
+      renderMenuHeader
+        ? [renderMenuHeader(h, collapsed)]
+        : [
+            collapsed
+              ? h('span', { class: 'sidebar-title' }, title)
+              : logo
+              ? h('img', { class: 'sidebar-logo', attrs: { src: logo, alt: title } })
+              : h('span', { class: 'sidebar-title' }, title.substr(0, 1))
+          ]
     )
 
     const Menu = (
@@ -329,10 +341,10 @@ export default {
       h('div', { class: 'main' }, [
         // header
         h('div', { class: 'header' }, [
-          h('div', { class: 'header-left' }, [ToggleButton, TopMenu]),
-          $slots.headerCenter && h('div', { class: 'header-center' }, $slots.headerCenter),
+          h('div', { class: 'header-left' }, [ToggleButton, TopMenu, renderHeaderLeft && renderHeaderLeft(h)]),
+          renderHeaderCenter && h('div', { class: 'header-center' }, [renderHeaderCenter(h)]),
           h('div', { class: 'header-right' }, [
-            h('div', { class: 'hide-is-mobile' }, $slots.headerRight),
+            renderHeaderRight && h('div', { class: 'hide-is-mobile' }, [renderHeaderRight(h)]),
             ColorPicker,
             FullscreenIcon,
             rightIcons && rightIcons.length > 0 && rightIcons.map(renderIconContainer),
@@ -340,13 +352,15 @@ export default {
             Language,
             User
           ]),
-          $slots.headerBottom && h('div', { class: 'header-bottom' }, $slots.headerBottom)
+          renderHeaderBottom && h('div', { class: 'header-bottom' }, [renderHeaderBottom(h)])
         ]),
         // content
         h('transition', { props: { name: 'fade-transform', mode: 'out-in' } }, [
-          h('div', { class: { 'main-content': true, 'has-header--bottom': !!$slots.headerBottom } }, [
-            renderContent ? renderContent(h) : $slots.default
-          ])
+          h(
+            'div',
+            { class: { 'main-content': true, 'has-header--bottom': renderHeaderBottom && renderHeaderBottom(h) } },
+            [renderContent ? renderContent(h) : $slots.default]
+          )
         ])
       ])
     ])
