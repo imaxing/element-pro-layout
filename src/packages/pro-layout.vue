@@ -65,6 +65,7 @@ const LayoutProps = {
     userName: { type: String, default: null, required: false },
     avatar: { type: String, default: null, required: false },
     popperClass: { type: String, default: '', required: false },
+    elementUiCdn: { type: String, default: undefined, required: false },
     menuBackgroundColor: { type: String, default: '#20222a', required: false },
     menuTextColor: { type: String, default: '#bfcbd9', required: false },
     menuActiveText: { type: String, default: '#409eff', required: false },
@@ -94,6 +95,7 @@ const WatchMixin = {
         if (!v) return
         modifyTheme({
           theme: v,
+          elementUiCdn: this.elementUiCdn,
           themeName: this.cssVariableName
         })
       },

@@ -10,6 +10,7 @@
       :menus="menus"
       :languages="languages"
       :top-menus="topMenus"
+      element-ui-cdn="https://cdn.jsdelivr.net/npm/element-ui@2.15.6/lib/theme-chalk/index.css"
       :right-icons="[
         {
           onClick: onIconClicked,
