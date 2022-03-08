@@ -10,10 +10,18 @@
       :menus="menus"
       :languages="languages"
       :top-menus="topMenus"
+      :notice-count="11"
       :right-icons="[
         {
           onClick: onIconClicked,
           render: h => h('el-badge', { props: { value: 10 } }, [h('i', { class: 'iconfont icon-feedback' })])
+        },
+        {
+          title: '通知',
+          icon: 'el-icon-bell',
+          count: 10,
+          popperProps: { width: 350 },
+          popperChildren: h => h('h1', '123')
         }
       ]"
       @top-menu-click="onTopMenuClicked"

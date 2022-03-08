@@ -169,22 +169,22 @@ export default {
       children = null,
       icon = '',
       title,
+      count = 0,
       render,
+      popperProps = {},
+      popperChildren,
       onClick = () => {}
     }) => {
       if (!condition) return null
-      return h('div', { attrs: { title }, class: `icon-container ${className}`, on: { click: onClick } }, [
-        render ? render(h) : children || h('i', { class: icon })
+      const content = render ? render(h) : children || h('i', { class: icon })
+      const IconEl = h('div', { attrs: { title }, class: `icon-container ${className}`, on: { click: onClick } }, [
+        count ? h('el-badge', { props: { value: count } }, [content]) : content
       ])
-    }
-
-    const renderPoper = ({ className = '', condition = true, reference, children }) => {
-      if (!condition) return null
-      return h(
-        'el-popover',
-        { props: { popperClass: className }, scopedSlots: { reference: () => reference } },
-        children
-      )
+      return popperChildren
+        ? h('el-popover', { props: popperProps, scopedSlots: { reference: () => IconEl } }, [
+            typeof popperChildren === 'function' ? popperChildren(h) : popperChildren
+          ])
+        : IconEl
     }
 
     const ToggleButton = renderIconContainer({
@@ -252,13 +252,6 @@ export default {
           ? h('img', { class: 'user-avatar', attrs: { src: avatar } })
           : [userName, h('i', { style: 'color: #93a533', class: 'iconfont icon-2PersonalCenter_01' })]
       })
-    })
-
-    const Notice = renderPoper({
-      condition: !!$slots.notice,
-      className: popperClass,
-      children: $slots.notice,
-      reference: renderIconContainer({ className: 'hide-is-mobile', title: '通知', icon: 'el-icon-bell' })
     })
 
     // logo
@@ -344,7 +337,6 @@ export default {
             FullscreenIcon,
             rightIcons && rightIcons.length > 0 && rightIcons.map(renderIconContainer),
             Feedback,
-            Notice,
             Language,
             User
           ]),
