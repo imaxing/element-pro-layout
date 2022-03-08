@@ -1,8 +1,8 @@
 <template>
   <div id="app" style="height: 100vh">
-    <!-- logo="https://tva1.sinaimg.cn/large/008i3skNgy1gz8i4tglttj308207z749.jpg" -->
     <pro-layout
-      :fixed-header="false"
+      logo="https://tva1.sinaimg.cn/large/008i3skNgy1gz8i4tglttj308207z749.jpg"
+      element-ui-cdn="https://cdn.jsdelivr.net/npm/element-ui@2.15.6/lib/theme-chalk/index.css"
       :menu-active.sync="menuActive"
       :collapsed.sync="collapsed"
       :theme.sync="theme"
@@ -10,7 +10,6 @@
       :menus="menus"
       :languages="languages"
       :top-menus="topMenus"
-      element-ui-cdn="https://cdn.jsdelivr.net/npm/element-ui@2.15.6/lib/theme-chalk/index.css"
       :right-icons="[
         {
           onClick: onIconClicked,
