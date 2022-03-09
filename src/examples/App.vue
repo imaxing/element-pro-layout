@@ -6,7 +6,6 @@
       :menu-active.sync="menuActive"
       :collapsed.sync="collapsed"
       :theme.sync="theme"
-      :render-menu-header="h => h('em', '哈哈哈')"
       title="SRM"
       :menus="menus"
       :languages="languages"
@@ -27,21 +26,7 @@
       ]"
       @top-menu-click="onTopMenuClicked"
     >
-      <el-tabs slot="notice" type="border-card">
-        <el-tab-pane label="用户管理" name="first">
-          用户管理
-        </el-tab-pane>
-        <el-tab-pane label="配置管理" name="second">
-          配置管理
-        </el-tab-pane>
-        <el-tab-pane label="角色管理" name="third">
-          角色管理
-        </el-tab-pane>
-        <el-tab-pane label="定时任务补偿" name="fourth">
-          定时任务补偿
-        </el-tab-pane>
-      </el-tabs>
-      <p v-for="item in 50" :key="item">
+      <p v-for="item in 20" :key="item">
         <el-button type="primary">
           hello world
         </el-button>
@@ -59,7 +44,7 @@ const menus = [
     children: [
       {
         meta: { icon: 'el-icon-check', title: '品管' },
-        path: '/material/category'
+        path: '/material/a'
       }
     ]
   },
@@ -121,12 +106,13 @@ const topMenus = [
     text: '系统配置'
   }
 ]
+
 export default {
   name: 'App',
   data: () => ({
     collapsed: false,
-    theme: '#D7C3C3',
-    menuActive: '/material/supplierpro',
+    theme: '#20222a',
+    menuActive: '/material/a',
     menus,
     topMenus,
     languages: [

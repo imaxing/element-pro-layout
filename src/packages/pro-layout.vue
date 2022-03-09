@@ -3,6 +3,7 @@ import debounce from 'lodash.debounce'
 import modifyTheme from '@iamgx/element-ui-theme-set'
 import Fullscreen from '@iamgx/fullscreen'
 import loadStyle from '@iamgx/load-style'
+import colorReverse from '@iamgx/color-reverse'
 const { toggle } = Fullscreen
 
 // 检测屏幕大小是否为手机端尺寸
@@ -64,14 +65,13 @@ const LayoutProps = {
     menuActive: { type: String, default: '/', required: false },
     userName: { type: String, default: null, required: false },
     avatar: { type: String, default: null, required: false },
-    popperClass: { type: String, default: '', required: false },
     elementUiCdn: { type: String, default: undefined, required: false },
-    menuBackgroundColor: { type: String, default: '#20222a', required: false },
-    menuTextColor: { type: String, default: '#bfcbd9', required: false },
-    menuActiveText: { type: String, default: '#409eff', required: false },
+    menuActiveText: { type: String, default: '#fafafa', required: false },
     theme: { type: String, default: '#409eff', required: false, validator: theme => !!theme && theme.startsWith('#') },
     cssVariableName: { type: String, default: '--primary-theme', required: false },
     renderContent: { type: Function, default: null, required: false },
+    contentTransition: { type: String, default: '', required: false },
+    sideBarWidth: { type: String, default: '210px', required: false },
     renderHeaderBottom: { type: Function, default: null, required: false },
     renderHeaderCenter: { type: Function, default: null, required: false },
     renderHeaderLeft: { type: Function, default: null, required: false },
@@ -116,22 +116,23 @@ const WatchMixin = {
 
 export default {
   name: 'ProLayout',
-  // for test
   mixins: [LayoutProps, isMobileMixin, FixiOSBug, WatchMixin],
   render(h) {
     const {
+      contentTransition,
       renderContent,
       uniqueOpened,
-      popperClass,
       fullscreen,
       languages,
       collapsed,
+      sideBarWidth,
       router,
       feedback,
       topMenus,
       userName,
       userOpts,
       rightIcons,
+      menuActiveText,
       avatar,
       mobile,
       theme,
@@ -146,11 +147,14 @@ export default {
       $slots
     } = this
 
+    const themeReverse = colorReverse(theme)
+
     const renderDropDown = ({ data = [], title, children, onCommand }) => {
       return h(
         'el-dropdown',
         {
           attrs: { title },
+          style: { color: themeReverse },
           props: { width: 150, transition: 'el-zoom-in-top', trigger: 'click' },
           on: {
             command: v => {
@@ -187,9 +191,15 @@ export default {
     }) => {
       if (!condition) return null
       const content = render ? render(h) : children || h('i', { class: icon })
-      const IconEl = h('div', { attrs: { title }, class: `icon-container ${className}`, on: { click: onClick } }, [
-        count ? h('el-badge', { props: { value: count } }, [content]) : content
-      ])
+      const IconEl = h(
+        'div',
+        {
+          attrs: { title },
+          class: `icon-container ${className}`,
+          on: { click: onClick }
+        },
+        [count ? h('el-badge', { props: { value: count } }, [content]) : content]
+      )
       return popperChildren
         ? h('el-popover', { props: popperProps, scopedSlots: { reference: () => IconEl } }, [
             typeof popperChildren === 'function' ? popperChildren(h) : popperChildren
@@ -260,14 +270,18 @@ export default {
         data: userOpts,
         children: avatar
           ? h('img', { class: 'user-avatar', attrs: { src: avatar } })
-          : [userName, h('i', { style: 'color: #93a533', class: 'iconfont icon-2PersonalCenter_01' })]
+          : [userName, h('i', { class: 'iconfont icon-2PersonalCenter_01' })]
       })
     })
 
     // logo
     const SideBarLogo = h(
-      'a',
-      { class: 'sidebar-logo-container', attrs: { href: '/' } },
+      'div',
+      {
+        class: 'sidebar-logo-container',
+        style: { background: theme },
+        on: { click: () => this.$emit('logo-click') }
+      },
       renderMenuHeader
         ? [renderMenuHeader(h, collapsed)]
         : [
@@ -284,14 +298,14 @@ export default {
         mode='vertical'
         unique-opened={uniqueOpened}
         default-active={this.menuActive}
-        text-color={this.menuTextColor}
-        background-color={this.menuBackgroundColor}
-        active-text-color={this.menuActiveText}
+        text-color={themeReverse}
+        background-color={theme}
+        active-text-color={menuActiveText}
         collapse={!collapsed}
+        router={router}
         onSelect={(index, indexPath) => {
           this.$emit('menu-click', index, indexPath)
         }}
-        router={router}
       >
         {menus.map((menu, index) =>
           menu.children ? (
@@ -334,36 +348,43 @@ export default {
     })
 
     // layout
-    return h('div', { class: { mobile, 'hide-sidebar': !collapsed, 'pro-layout': true } }, [
-      // sidebar
-      h('div', { class: 'sidebar' }, [SideBarLogo, h('el-scrollbar', [Menu])]),
-      // main
-      h('div', { class: 'main' }, [
-        // header
-        h('div', { class: 'header' }, [
-          h('div', { class: 'header-left' }, [ToggleButton, TopMenu, renderHeaderLeft && renderHeaderLeft(h)]),
-          renderHeaderCenter && h('div', { class: 'header-center' }, [renderHeaderCenter(h)]),
-          h('div', { class: 'header-right' }, [
-            renderHeaderRight && h('div', { class: 'hide-is-mobile' }, [renderHeaderRight(h)]),
-            ColorPicker,
-            FullscreenIcon,
-            rightIcons && rightIcons.length > 0 && rightIcons.map(renderIconContainer),
-            Feedback,
-            Language,
-            User
-          ]),
-          renderHeaderBottom && h('div', { class: 'header-bottom' }, [renderHeaderBottom(h)])
+    return h(
+      'div',
+      { style: { color: themeReverse }, class: { mobile, 'hide-sidebar': !collapsed, 'pro-layout': true } },
+      [
+        // sidebar
+        h('div', { class: 'sidebar', style: { background: theme, width: sideBarWidth } }, [
+          SideBarLogo,
+          h('el-scrollbar', [Menu])
         ]),
-        // content
-        h('transition', { props: { name: 'fade-transform', mode: 'out-in' } }, [
-          h(
-            'div',
-            { class: { 'main-content': true, 'has-header--bottom': renderHeaderBottom && renderHeaderBottom(h) } },
-            [renderContent ? renderContent(h) : $slots.default]
-          )
+        // main
+        h('div', { class: 'main', style: { marginLeft: collapsed ? sideBarWidth : '54px' } }, [
+          // header
+          h('div', { class: 'header', style: { background: theme, width: `calc(100% - ${sideBarWidth})` } }, [
+            h('div', { class: 'header-left' }, [ToggleButton, TopMenu, renderHeaderLeft && renderHeaderLeft(h)]),
+            renderHeaderCenter && h('div', { class: 'header-center' }, [renderHeaderCenter(h)]),
+            h('div', { class: 'header-right' }, [
+              renderHeaderRight && h('div', { class: 'hide-is-mobile' }, [renderHeaderRight(h)]),
+              ColorPicker,
+              FullscreenIcon,
+              rightIcons && rightIcons.length > 0 && rightIcons.map(renderIconContainer),
+              Feedback,
+              Language,
+              User
+            ]),
+            renderHeaderBottom && h('div', { class: 'header-bottom' }, [renderHeaderBottom(h)])
+          ]),
+          // content
+          h('transition', { props: { name: contentTransition } }, [
+            h(
+              'div',
+              { class: { 'main-content': true, 'has-header--bottom': renderHeaderBottom && renderHeaderBottom(h) } },
+              [renderContent ? renderContent(h) : $slots.default]
+            )
+          ])
         ])
-      ])
-    ])
+      ]
+    )
   }
 }
 </script>
@@ -402,8 +423,7 @@ $headerBottomHeight: 40px;
   }
 
   .sidebar {
-    transition: width 0.2s cubic-bezier(0.22, -0.26, 0.85, 1.24);
-    width: $sideBarWidth !important;
+    transition: width 0.2s cubic-bezier(0.39, 0.58, 0.57, 1);
     height: 100vh;
     position: fixed;
     top: 0;
@@ -438,14 +458,12 @@ $headerBottomHeight: 40px;
       .sidebar-title {
         display: inline-block;
         margin: 0;
-        color: #fff;
         font-weight: 400;
         line-height: 50px;
         font-size: 20px;
         font-family: Avenir, Helvetica Neue, Arial, Helvetica, sans-serif;
         vertical-align: middle;
         font-size: 20px;
-        color: #fff;
       }
     }
     .el-scrollbar {
@@ -458,8 +476,7 @@ $headerBottomHeight: 40px;
 
   .main {
     min-height: 100%;
-    transition: margin-left 0.28s;
-    margin-left: $sideBarWidth;
+    transition: margin-left 0.2s cubic-bezier(0.39, 0.58, 0.57, 1);
     position: relative;
 
     .header {
@@ -467,13 +484,12 @@ $headerBottomHeight: 40px;
       align-items: center;
       justify-content: space-between;
       background: #fff;
-      transition: width 0.28s;
+      transition: width 0.2s cubic-bezier(0.39, 0.58, 0.57, 1);
       box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
       position: fixed;
       top: 0;
       right: 0;
       z-index: 9;
-      width: calc(100% - #{$sideBarWidth});
 
       .header-center,
       .header-left,
@@ -495,7 +511,6 @@ $headerBottomHeight: 40px;
 
       .top-menu {
         font-size: 14px;
-        color: #303133;
         padding: 0 8px;
         height: $headerHeight;
         cursor: pointer;
@@ -578,17 +593,15 @@ $headerBottomHeight: 40px;
       height: 100%;
       width: 100% !important;
 
-      .el-menu-item:hover,
-      .el-submenu__title:hover {
-        background-color: #263445 !important;
-      }
-
       .nest-menu .el-submenu > .el-submenu__title,
       .el-submenu .el-menu-item {
-        min-width: $sideBarWidth !important;
+        min-width: 100% !important;
       }
     }
     // el-menu end
+  }
+  .el-color-picker__trigger {
+    border-color: currentColor;
   }
 }
 
@@ -596,20 +609,5 @@ $headerBottomHeight: 40px;
   .hide-is-mobile {
     display: none !important;
   }
-}
-
-.fade-transform-leave-active,
-.fade-transform-enter-active {
-  transition: all 0.5s;
-}
-
-.fade-transform-enter {
-  opacity: 0;
-  transform: translateX(-30px);
-}
-
-.fade-transform-leave-to {
-  opacity: 0;
-  transform: translateX(30px);
 }
 </style>
