@@ -1,6 +1,6 @@
 {
   "name": "@iamgx/pro-layout",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "pro-layout",
   "private": false,
   "main": "./dist/pro-layout.umd.min.js",
