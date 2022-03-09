@@ -16,6 +16,7 @@
     "README.md"
   ],
   "dependencies": {
+    "@iamgx/color-reverse": "^1.0.0",
     "@iamgx/element-ui-theme-set": "^1.0.2",
     "@iamgx/fullscreen": "^1.0.1",
     "@iamgx/load-style": "^1.0.0",
