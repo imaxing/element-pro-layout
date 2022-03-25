@@ -15,19 +15,15 @@
     "package.json",
     "README.md"
   ],
-  "dependencies": {
-    "@iamgx/color-reverse": "^1.0.0",
-    "@iamgx/element-ui-theme-set": "^1.0.2",
-    "@iamgx/fullscreen": "^1.0.1",
-    "@iamgx/load-style": "^1.0.0",
-    "lodash.debounce": "^4.0.8"
-  },
   "peerDependency": {
     "element-ui": "^2.15.6",
-    "vue": "^2.6.11",
-    "vue-router": "^3.0.1"
+    "vue": "^2.6.11"
   },
   "devDependencies": {
+    "@iamgx/fullscreen": "^1.0.1",
+    "@iamgx/load-style": "^1.0.0",
+    "@iamgx/element-ui-theme-set": "^1.0.2",
+    "@iamgx/color-reverse": "^1.0.0",
     "@vue/cli-plugin-babel": "^3.12.0",
     "@vue/cli-plugin-eslint": "^3.12.0",
     "@vue/cli-service": "^3.12.0",
@@ -41,6 +37,7 @@
     "sass": "^1.49.8",
     "sass-loader": "^9.0.3",
     "vue": "^2.6.11",
+    "vue-router": "^3.0.1",
     "vue-template-compiler": "^2.6.11"
   }
 }
