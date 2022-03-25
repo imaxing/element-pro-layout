@@ -15,6 +15,21 @@
     "package.json",
     "README.md"
   ],
+  "homepage": "https://github.com/imaxing/element-pro-layout",
+  "repository": {
+    "url": "https://github.com/imaxing/element-pro-layout"
+  },
+  "keywords": [
+    "element-ui",
+    "element-ui layout",
+    "element-ui prolayout",
+    "element-ui-pro-layout",
+    "element-pro-layout",
+    "pro-layout",
+    "pro-layout-element",
+    "pro-layout-element-ui",
+    "el-pro-layout"
+  ],
   "peerDependency": {
     "element-ui": "^2.15.6",
     "vue": "^2.6.11"
