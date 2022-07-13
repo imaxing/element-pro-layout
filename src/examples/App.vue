@@ -2,6 +2,7 @@
   <div id="app" style="height: 100vh">
     <pro-layout
       title="SRM"
+      menu-path-field="url"
       :menu-active="menuActive"
       :collapsed.sync="collapsed"
       :loading="loading"
@@ -52,6 +53,7 @@
           }
         }
       ]"
+      @menu-click="onMenuItemClicked"
     >
       <el-button type="primary">
         hello world
@@ -65,19 +67,19 @@ const menus = [
   {
     meta: { icon: 'el-icon-eleme', title: '品类管理' },
     name: '品类管理',
-    path: '/material/category',
+    url: '/material/category',
     children: [
       {
         meta: { icon: 'el-icon-check', title: '品管' },
-        path: '/material/a',
+        url: '/material/a',
         children: [
           {
             meta: { icon: 'el-icon-check', title: '品管' },
-            path: '/material/b',
+            url: '/material/b',
             children: [
               {
                 meta: { icon: 'el-icon-check', title: '品管' },
-                path: '/material/c'
+                url: '/material/c'
               }
             ]
           }
@@ -88,7 +90,7 @@ const menus = [
   {
     meta: { icon: 'el-icon-s-tools', title: '供应商产品管理' },
     name: '供应商产品管理',
-    path: '/material/supplierpro'
+    url: '/material/supplierpro'
   }
 ]
 import Fullscreen from '@iamgx/fullscreen'
@@ -121,6 +123,9 @@ export default {
   methods: {
     colorReverse,
     toggle,
+    onMenuItemClicked(v) {
+      console.log(v)
+    },
     onThemeChange(theme) {
       this.theme = theme
       modifyTheme({

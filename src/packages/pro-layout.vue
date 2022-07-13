@@ -39,6 +39,7 @@ const LayoutProps = {
   props: {
     title: { type: String, default: 'Pro Layout' },
     logo: { type: String, default: null },
+    menuPathField: { type: String, default: 'path' },
     menus: { type: Array, default: () => [], required: true },
     loading: { type: Boolean, default: false },
     rightIcons: { type: Array, default: () => [] },
@@ -78,6 +79,7 @@ export default {
       menuActiveText,
       mobile,
       logo,
+      menuPathField,
       $slots,
       theme,
       themeReverse,
@@ -160,7 +162,7 @@ export default {
 
     const renderMenuItems = (menu, index) => {
       return menu.children ? (
-        <el-submenu ref='subMenu' index={menu.path} key={index}>
+        <el-submenu ref='subMenu' index={menu[menuPathField]} key={index}>
           <template slot='title'>
             <i class={menu.icon || menu.meta.icon} />
             <span slot='title'>{menu.name || menu.title || menu.meta.title}</span>
@@ -168,7 +170,7 @@ export default {
           {menu.children && menu.children.map(renderMenuItems)}
         </el-submenu>
       ) : (
-        <el-menu-item index={menu.path} key={index} route={menu}>
+        <el-menu-item index={menu[menuPathField]} key={index} route={menu}>
           <i class={menu.icon || menu.meta.icon} />
           <span slot='title'>{menu.name || menu.title || menu.meta.title}</span>
         </el-menu-item>
